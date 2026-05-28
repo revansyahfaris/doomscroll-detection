@@ -12,7 +12,7 @@ def _play_sound(file_path):
         while pygame.mixer.music.get_busy():
             pygame.time.Clock().tick(10)
     else:
-        print(f"Peringatan: File audio tidak ditemukan di {file_path}!")
+        print(f"Warning: Audio file not found at {file_path}!")
 
 def play_warning():
     audio_path = os.path.join("assets", "alarm.mp3")

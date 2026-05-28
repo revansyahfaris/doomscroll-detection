@@ -6,11 +6,11 @@ from src.audio_engine import play_warning, stop_warning
 from src.vision_engine import is_head_tilted_down
 
 def background_camera_loop():
-    print("Memulai pemantauan background...")
+    print("Starting background monitoring...")
     cap = cv2.VideoCapture(0)
     
     consecutive_tilt_count = 0
-    BATAS_TILT = 5 # Jumlah frame menunduk berturut-turut sebelum alarm berbunyi
+    TILT_THRESHOLD = 5 # Number of consecutive tilted frames before the alarm triggers
 
     while app_state["is_running"]:
         if app_state["is_paused"]:
@@ -19,29 +19,29 @@ def background_camera_loop():
 
         success, frame = cap.read()
         if success:
-            # Analisa frame-nya
+            # Analyze the frame
             is_tilted = is_head_tilted_down(frame)
 
-            # Logika Alarm
+            # Alarm Logic
             if is_tilted:
                 consecutive_tilt_count += 1
-                print(f"Menunduk terdeteksi: {consecutive_tilt_count}/{BATAS_TILT}")
-                if consecutive_tilt_count >= BATAS_TILT:
+                print(f"Tilt detected: {consecutive_tilt_count}/{TILT_THRESHOLD}")
+                if consecutive_tilt_count >= TILT_THRESHOLD:
                     play_warning()
                     consecutive_tilt_count = 0 
                 
             else:
                 consecutive_tilt_count = 0 
-                stop_warning()  # Hentikan suara alarm jika tidak menunduk
+                stop_warning()  # Stop the alarm if not tilting
 
-            # --- LOGIKA TAMPILKAN LAYAR KAMERA ---
+            # --- CAMERA DISPLAY LOGIC ---
             if app_state["show_camera"]:
-                # Teks indikator status
-                warna = (0, 0, 255) if is_tilted else (0, 255, 0)
-                teks = "NUNDUK!" if is_tilted else "TEGAK"
-                cv2.putText(frame, teks, (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, warna, 3)
+                # Status indicator text
+                color = (0, 0, 255) if is_tilted else (0, 255, 0)
+                text = "TILTED!" if is_tilted else "UPRIGHT"
+                cv2.putText(frame, text, (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, color, 3)
                 
-                cv2.imshow("Monitor Doomscroll (1 FPS)", frame)
+                cv2.imshow("Doomscroll Monitor (1 FPS)", frame)
                 
                 cv2.waitKey(1000) 
             else:
@@ -49,7 +49,7 @@ def background_camera_loop():
 
     cap.release()
     cv2.destroyAllWindows()
-    print("Kamera dimatikan.")
+    print("Camera turned off.")
 
 if __name__ == "__main__":
     camera_thread = threading.Thread(target=background_camera_loop, daemon=True)

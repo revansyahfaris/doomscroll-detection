@@ -28,7 +28,7 @@ def quit_app(icon, item):
     icon.stop()
 
 def setup_tray():
-    # Menambahkan tombol Show/Hide Camera di tray menu
+    # Add Show/Hide Camera buttons to the tray menu
     menu = pystray.Menu(
         item(lambda text: "Resume Detection" if app_state["is_paused"] else "Pause Detection", toggle_pause),
         item(lambda text: "Hide Camera" if app_state["show_camera"] else "Show Camera", toggle_camera),
